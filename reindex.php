@@ -27,32 +27,34 @@ if(isset($argv[3])) {
 } else {
   passthru("curl '".COUCHDB."/_all_docs?include_docs=true' -o '".$db.".json'");
   $all = json_decode(file_get_contents($db.".json"));
+
+  // Only delete index and recreate it if reindexing all documents
+  // Otherwise, keep old index
+  $curl = curl_init(ELASTICSEARCH);
+  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+  curl_setopt($curl, CURLOPT_HEADER, false);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: 0'));
+
+  // Make the REST call, returning the result
+  $response = curl_exec($curl);
+  if (!$response) {
+      die("Connection Failure.n");
+  }
+  echo $response."\n";
+
+  curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+  curl_setopt($curl, CURLOPT_HEADER, false);
+  curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: 0'));
+
+  // Make the REST call, returning the result
+  $response = curl_exec($curl);
+  if (!$response) {
+      die("Connection Failure.n");
+  }
+  echo $response."\n";
 }
-
-$curl = curl_init(ELASTICSEARCH);
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-curl_setopt($curl, CURLOPT_HEADER, false);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: 0'));
-
-// Make the REST call, returning the result
-$response = curl_exec($curl);
-if (!$response) {
-    die("Connection Failure.n");
-}
-echo $response."\n";
-
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-curl_setopt($curl, CURLOPT_HEADER, false);
-curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: 0'));
-
-// Make the REST call, returning the result
-$response = curl_exec($curl);
-if (!$response) {
-    die("Connection Failure.n");
-}
-echo $response."\n";
 
 $docs = [];
 $inserted = [];
