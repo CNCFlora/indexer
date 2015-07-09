@@ -1,7 +1,8 @@
 #!/bin/bash
 
-DB=$1
-FILE=$2
+SERVER=$1
+DB=$2
+FILE=$3
 
-cat $FILE | xargs -I{} -d"\n" ./rm.sh $DB {}
+cat $FILE | xargs -I{} -d"\n" ./rm.sh $SERVER $DB {}
 

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-SERVER=http://cncflora.jbrj.gov.br
-COUCH="$SERVER/couchdb"
-ES="$SERVER/elasticsearch"
+SERVER="http://$ARGV[0]"
+COUCH="$SERVER:5984"
+ES="$SERVER:9200"
 DB=$1
-ID=$(perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "$2")
+ID=$(perl -MURI::Escape -e 'print uri_escape($ARGV[1]);' "$2")
 URL0="$COUCH/$DB/$ID"
 
 REV=$(curl "${URL0}" | grep '"_rev":"\([a-zA-Z0-9\-]\+\)"' -o | sed -e 's/"//g' -e 's/_rev://')
