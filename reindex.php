@@ -100,4 +100,4 @@ if($i<5500) continue;
 echo count($inserted)." records inserted.\n";
 echo count($not_inserted)." records NOT inserted.\n";
 
-file_put_contents('not_inserted.txt', var_export($not_inserted, true));
+file_put_contents('not_inserted.json', json_encode($not_inserted));
