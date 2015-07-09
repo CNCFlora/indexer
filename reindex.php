@@ -12,10 +12,10 @@ if(!isset($argv[2])) {
 $host = $argv[1];
 $db = $argv[2];
 
-define("COUCHDB", $host.':5984/'.$db);
-define("ELASTICSEARCH", $host.':9200/'.$db);
+define("COUCHDB",'http://'.$host.':5984/'.$db);
+define("ELASTICSEARCH", 'http://'.$host.':9200/'.$db);
 
-echo "Host:".$host."\n";
+echo "Host: ".$host."\n";
 echo "Database: ".$db."\n";
 
 if(isset($argv[3])) {
@@ -26,7 +26,14 @@ if(isset($argv[3])) {
   $all->rows[0]->doc = $doc;
 } else {
   passthru("curl '".COUCHDB."/_all_docs?include_docs=true' -o '".$db.".json'");
-  $all = json_decode(file_get_contents($db.".json"));
+  $all = new StdClass;
+  $all->rows = array();
+  $af = fopen($db.".json",'r');
+  fgets($af);
+  while($l = fgets($af)){
+    $all->rows[] = json_decode(substr($l,0,-3));
+  }
+  //$all = json_decode(file_get_contents($db.".json"));
 
   // Only delete index and recreate it if reindexing all documents
   // Otherwise, keep old index
@@ -59,19 +66,24 @@ if(isset($argv[3])) {
 $docs = [];
 $inserted = [];
 $not_inserted = [];
+$i=0;
 foreach($all->rows as $row) {
+$i++;
+if($i<5500) continue;
     $doc = $row->doc;
     $doc->id = $doc->_id;
     $doc->rev=  $doc->_rev;
     unset($doc->_id);
     unset($doc->_rev);
     $json = json_encode($doc);
+/*
     $opts_count = ['http'=>['method'=>'GET','header'=>'Content-type: application/json']];
     $counter_response = file_get_contents(ELASTICSEARCH."/_count", NULL, stream_context_create($opts_count));
     $counter_before = json_decode($counter_response)->count;
-
+*/
     $opts = ['http'=>['method'=>'POST','content'=>$json,'header'=>'Content-type: application/json']];
     echo file_get_contents(ELASTICSEARCH."/".$doc->metadata->type."/".urlencode($doc->id), NULL, stream_context_create($opts))."\n";
+/*
     $refresh_response = file_get_contents(ELASTICSEARCH."/_refresh", NULL, stream_context_create($opts_count));
 
     $counter_response = file_get_contents(ELASTICSEARCH."/_count", NULL, stream_context_create($opts_count));
@@ -82,6 +94,7 @@ foreach($all->rows as $row) {
     } else {
         $not_inserted[] = $doc->id;
     }
+*/
 }
 
 echo count($inserted)." records inserted.\n";
