@@ -76,14 +76,13 @@ if($i<5500) continue;
     unset($doc->_id);
     unset($doc->_rev);
     $json = json_encode($doc);
-/*
+
     $opts_count = ['http'=>['method'=>'GET','header'=>'Content-type: application/json']];
     $counter_response = file_get_contents(ELASTICSEARCH."/_count", NULL, stream_context_create($opts_count));
+
     $counter_before = json_decode($counter_response)->count;
-*/
     $opts = ['http'=>['method'=>'POST','content'=>$json,'header'=>'Content-type: application/json']];
     echo file_get_contents(ELASTICSEARCH."/".$doc->metadata->type."/".urlencode($doc->id), NULL, stream_context_create($opts))."\n";
-/*
     $refresh_response = file_get_contents(ELASTICSEARCH."/_refresh", NULL, stream_context_create($opts_count));
 
     $counter_response = file_get_contents(ELASTICSEARCH."/_count", NULL, stream_context_create($opts_count));
@@ -94,7 +93,6 @@ if($i<5500) continue;
     } else {
         $not_inserted[] = $doc->id;
     }
-*/
 }
 
 echo count($inserted)." records inserted.\n";
