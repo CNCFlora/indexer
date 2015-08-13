@@ -49,5 +49,5 @@ Example:
     echo id1 > ids
     echo id2 >> ids
     echo id3 >> ids
-    ./rm_all.sh jb948 endemicas_rio_de_janeiro ids
+    ./rm_all.sh jb048 endemicas_rio_de_janeiro ids
 
